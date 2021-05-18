@@ -3,8 +3,28 @@ declare const Ya: any;
 export class Metrika {
   private _metricaInsert?: Promise<YandexMetrika>;
   private _counter!: YandexMetrika;
+  private readonly counterConfig: YandexCounterConfig;
 
-  constructor(public counterConfig: YandexCounterConfig, initCounterAfterInitialize: boolean = true) {
+  constructor(
+    id: number,
+    clickmap: boolean = true,
+    trackLinks: boolean = true,
+    accurateTrackBounce: boolean = true,
+    webvisor: boolean = true,
+    trackHash: boolean = false,
+    defer: boolean = false,
+    initCounterAfterInitialize: boolean = true,
+  ) {
+    this.counterConfig = {
+      id,
+      defer,
+      clickmap,
+      trackLinks,
+      accurateTrackBounce,
+      webvisor,
+      trackHash,
+      triggerEvent: true,
+    };
     if (initCounterAfterInitialize) {
       this.getCounter();
     }
@@ -23,7 +43,7 @@ export class Metrika {
           document.addEventListener(`yacounter${this.counterConfig.id}inited`, () => {
             resolve(this._counter);
           });
-          this._counter = new Ya.Metrika2(this.counterConfig);
+          this._counter = new Ya.Metrika2(this.counterConfig) as YandexMetrika;
         };
         if (typeof node !== 'undefined' && node.parentNode !== null) {
           node.parentNode.insertBefore(script, node);
@@ -55,11 +75,6 @@ export class Metrika {
     counter.userParams(params);
   }
 
-  public async replacePhones(): Promise<void> {
-    const counter = await this.getCounter();
-    counter.replacePhones();
-  }
-
   public async fireEvent(type: string, options: CommonOptions = {}): Promise<void> {
     const counter = await this.getCounter();
     return new Promise<void>((resolve: () => void) => {
@@ -81,7 +96,7 @@ export interface YandexCounterConfig {
   defer: boolean;
   clickmap?: boolean;
   trackLinks?: boolean;
-  accurateTrackBounce?: boolean;
+  accurateTrackBounce?: boolean | number;
   webvisor?: boolean;
   trackHash?: boolean;
   ut?: string;
