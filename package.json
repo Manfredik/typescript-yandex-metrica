@@ -8,18 +8,21 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "prepare" : "npm run build",
-    "prepublishOnly" : "npm run lint",
-    "preversion" : "npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Manfredik/typescript-yandex-metrica.git"
   },
-  "keywords": ["Yandex", "Metrika", "Typescript"],
+  "keywords": [
+    "Yandex",
+    "Metrika",
+    "Typescript"
+  ],
   "author": "Denis Malyavkin",
   "license": "ISC",
   "bugs": {
@@ -27,10 +30,13 @@
   },
   "homepage": "https://github.com/Manfredik/typescript-yandex-metrica#readme",
   "devDependencies": {
+    "@types/yandex-metrika-tag": "^2.0.1",
     "prettier": "^2.3.0",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.2.4"
   },
-  "files": ["lib/**/*"]
+  "files": [
+    "lib/**/*"
+  ]
 }

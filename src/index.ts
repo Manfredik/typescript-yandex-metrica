@@ -3,7 +3,7 @@ declare const Ya: any;
 export class Metrika {
   private _metricaInsert?: Promise<YandexMetrika>;
   private _counter!: YandexMetrika;
-  private readonly counterConfig: YandexCounterConfig;
+  private readonly counterConfig: InitParameters;
 
   constructor(
     id: number,
@@ -13,7 +13,7 @@ export class Metrika {
     webvisor: boolean = true,
     trackHash: boolean = false,
     defer: boolean = false,
-    initCounterAfterInitialize: boolean = true,
+    loadCounterAfterInitialize: boolean = true,
   ) {
     this.counterConfig = {
       id,
@@ -25,7 +25,7 @@ export class Metrika {
       trackHash,
       triggerEvent: true,
     };
-    if (initCounterAfterInitialize) {
+    if (loadCounterAfterInitialize) {
       this.getCounter();
     }
   }
@@ -65,24 +65,24 @@ export class Metrika {
     counter.setUserID(userId);
   }
 
-  public async userParams(params: any): Promise<void> {
+  public async userParams(params: ym.UserParameters): Promise<void> {
     const counter = await this.getCounter();
     counter.userParams(params);
   }
 
-  public async params(params: any): Promise<void> {
+  public async params(params: ym.UserParameters): Promise<void> {
     const counter = await this.getCounter();
     counter.userParams(params);
   }
 
-  public async fireEvent(type: string, options: CommonOptions = {}): Promise<void> {
+  public async fireEvent(type: string, options: ym.VisitParameters = {}): Promise<void> {
     const counter = await this.getCounter();
     return new Promise<void>((resolve: () => void) => {
       counter.reachGoal(type, options, resolve, this);
     });
   }
 
-  public async hit(url: string, options: HitOptions = {}): Promise<any> {
+  public async hit<CTX>(url: string, options: ym.HitOptions<CTX> = {}): Promise<any> {
     const counter = await this.getCounter();
 
     return new Promise<void>((resolve: () => void) => {
@@ -91,50 +91,19 @@ export class Metrika {
     });
   }
 }
-export interface YandexCounterConfig {
+
+interface InitParameters extends ym.InitParameters {
   id: number;
-  defer: boolean;
-  clickmap?: boolean;
-  trackLinks?: boolean;
-  accurateTrackBounce?: boolean | number;
-  webvisor?: boolean;
-  trackHash?: boolean;
-  ut?: string;
-  triggerEvent: boolean;
-}
-
-export interface CallbackOptions {
-  callback?: () => any;
-  ctx?: any;
-}
-
-export interface CommonOptions extends CallbackOptions {
-  params?: any;
-  title?: any;
-}
-
-export interface HitOptions extends CommonOptions {
-  referer?: string;
-  callback?: () => void;
-  title?: string;
-}
-
-export interface ExtLinkOptions {
-  callback?: () => void;
-  title?: string;
-  ctx?: any;
-  referer?: any;
-  params?: { order_price: number; currency: string };
 }
 
 export interface YandexMetrika {
-  reachGoal: (target: string, params?: any, callback?: () => void, ctx?: any) => void;
+  reachGoal: (target: string, params?: ym.VisitParameters, callback?: () => void, ctx?: any) => void;
   addFileExtension: (extensions: string | string[]) => void;
-  extLink: (url: string, options?: ExtLinkOptions) => void;
+  extLink: <CTX>(url: string, options?: ym.ExtLinkOptions<CTX>) => void;
   getClientID: () => string;
   setUserID: (userId: string) => void;
-  notBounce: (options: CallbackOptions) => string;
-  userParams: (parameters: any) => void;
+  notBounce: <CTX>(options: ym.NotBounceOptions<CTX>) => string;
+  userParams: (parameters: ym.UserParameters) => void;
   replacePhones: () => void;
-  hit: (url: string, options?: ExtLinkOptions) => void;
+  hit: <CTX>(url: string, options?: ym.HitOptions<CTX>) => void;
 }
